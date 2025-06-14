@@ -4,6 +4,7 @@ import "./globals.css";
 import DarkModeContext from "./Providers/ThemeContext";
 import Header from "./components/Header";
 import { Inter } from "next/font/google";
+import AuthProvider from "./auth/Provider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -37,8 +38,10 @@ export default function RootLayout({
         className={`${inter.variable} ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <DarkModeContext>
-          <Header user={null} />
-          {children}
+          <AuthProvider>
+            <Header />
+            {children}
+          </AuthProvider>
         </DarkModeContext>
       </body>
     </html>
