@@ -33,7 +33,7 @@ export async function GET() {
       orderBy: { updatedAt: "desc" },
     });
 
-    const formattedChats = chats.map((chat) => ({
+    const formattedChats = chats.map((chat: any) => ({
       id: chat.id,
       title: chat.title,
       lastMessage: chat.messages[0]
