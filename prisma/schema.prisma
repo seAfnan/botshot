@@ -65,11 +65,12 @@ model VerificationToken {
 }
 
 model Chat {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  title     String
-  userId    String   @db.ObjectId
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  userId      String   @db.ObjectId
+  lastMessage String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages  Message[]
@@ -79,13 +80,15 @@ model Chat {
 }
 
 model Message {
-  id        String      @id @default(auto()) @map("_id") @db.ObjectId
-  content   String
-  sender    String
-  chatId    String      @db.ObjectId
-  role      MessageRole
-  sessionId String      @db.ObjectId
-  createdAt DateTime    @default(now())
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  content     String
+  sender      String
+  chatId      String      @db.ObjectId
+  streaming   Boolean?
+  role        MessageRole
+  generatedBy String?
+  sessionId   String      @db.ObjectId
+  createdAt   DateTime    @default(now())
 
   session Chat @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 

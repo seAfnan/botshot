@@ -41,3 +41,28 @@ body.light {
   background-color: #fff;
   color: #000;
 }
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Scrollbar width */
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+/* Scrollbar track (background) */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Scrollbar thumb (the draggable part) */
+::-webkit-scrollbar-thumb {
+  background: rgba(182, 182, 182, 0.4); /* Optional: semi-transparent dark thumb */
+  border-radius: 4px;
+}
+

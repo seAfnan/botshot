@@ -49,6 +49,7 @@ export async function GET(
       sender: message.sender,
       role: message.role,
       content: message.content,
+      generatedBy: message.generatedBy,
       timestamp: new Date(message.createdAt).toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",

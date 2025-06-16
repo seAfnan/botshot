@@ -1,49 +1,59 @@
 "use client";
-import React, { useContext, useState, useRef, useEffect } from "react";
-import { ThemeContext } from "../Providers/ThemeContext";
-import { signIn, signOut, useSession } from "next-auth/react";
+import React, { RefObject } from "react";
+import { Session } from "next-auth";
+import { signIn, signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LuLogOut } from "react-icons/lu";
 import { FaMoon } from "react-icons/fa";
 import { MdSunny } from "react-icons/md";
 
-const Header = () => {
-  const context = useContext(ThemeContext);
-  const { switchDark, switchLight, theme } = context ?? {};
-  const { status, data: session } = useSession();
+interface HeaderProps {
+  session: Session | null;
+  status: "authenticated" | "unauthenticated" | "loading";
+  theme?: string;
+  switchDark?: () => void;
+  switchLight?: () => void;
+  dropdownOpen: boolean;
+  setDropdownOpen: (open: boolean) => void;
+  dropdownRef: RefObject<HTMLDivElement | null>; // Updated type to allow null
+}
+
+const Header: React.FC<HeaderProps> = ({
+  session,
+  status,
+  theme,
+  switchDark,
+  switchLight,
+  dropdownOpen,
+  setDropdownOpen,
+  dropdownRef,
+}) => {
   const user = session?.user;
-
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setDropdownOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   return (
     <header
-      className={`flex items-center justify-between px-6 py-2 shadow-md transition-colors duration-300 ${
-        theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-gray-900"
+      className={`w-full flex items-center justify-between px-6 py-2 pb-0 shadow-md transition-colors duration-300 ${
+        theme === "dark"
+          ? "bg-neutral-900/70 text-white"
+          : "bg-neutral-200 text-neutral-900"
       }`}
     >
-      {/* Left: Brand */}
-      <div className="text-2xl font-bold tracking-tight">Botshot</div>
+      <div
+        className={`text-3xl font-semibold tracking-tight bg-clip-text text-transparent bg-gradient-to-r ${
+          theme === "dark"
+            ? "from-pink-400 via-purple-400 to-blue-400"
+            : "from-blue-600 via-purple-600 to-pink-600"
+        }
+        `}
+      >
+        Botshot
+      </div>
 
-      {/* Right: Controls */}
       <div className="flex items-center gap-4 relative">
         {status === "authenticated" && user ? (
           <div ref={dropdownRef} className="relative">
             <button
-              onClick={() => setDropdownOpen((prev) => !prev)}
+              onClick={() => setDropdownOpen(!dropdownOpen)}
               className="focus:outline-none cursor-pointer"
             >
               {user.image ? (
@@ -53,12 +63,11 @@ const Header = () => {
                   className="w-9 h-9 rounded-full object-cover"
                 />
               ) : (
-                <div className="w-9 h-9 bg-gray-700 rounded-full flex items-center justify-center text-sm font-semibold uppercase text-white">
+                <div className="w-9 h-9 bg-neutral-700 rounded-full flex items-center justify-center text-sm font-semibold uppercase text-white">
                   {user.name?.[0] ?? "?"}
                 </div>
               )}
             </button>
-
             <AnimatePresence>
               {dropdownOpen && (
                 <motion.div
@@ -68,40 +77,35 @@ const Header = () => {
                   transition={{ duration: 0.2 }}
                   className={`absolute right-0 mt-2 w-64 rounded-lg shadow-lg z-50 p-4 ${
                     theme === "dark"
-                      ? "bg-gray-800 text-white"
-                      : "bg-white text-gray-900"
+                      ? "bg-neutral-800 text-white"
+                      : "bg-white text-neutral-900"
                   }`}
                 >
-                  {/* User Info */}
                   <div className="mb-2">
                     <p className="font-semibold text-sm">{user.name}</p>
-                    <p className="text-xs text-gray-400">{user.email}</p>
+                    <p className="text-xs text-neutral-400">{user.email}</p>
                   </div>
-
-                  {/* Theme Toggle */}
                   <button
                     onClick={theme === "dark" ? switchLight : switchDark}
                     className={`flex items-center gap-2 w-full text-left px-4 py-2 rounded text-sm font-medium transition mb-2  ${
                       theme === "dark"
-                        ? "bg-gray-700 hover:bg-gray-600 text-white"
-                        : "bg-gray-200 hover:bg-gray-300 text-gray-900"
+                        ? "bg-neutral-700 hover:bg-neutral-600 text-white"
+                        : "bg-neutral-200 hover:bg-neutral-300 text-neutral-900"
                     }`}
                   >
                     {theme === "dark" ? (
                       <MdSunny className="text-amber-200" />
                     ) : (
-                      <FaMoon className="text-gray-800" />
+                      <FaMoon className="text-neutral-800" />
                     )}
                     {theme === "dark" ? "Light Mode" : "Dark Mode"}
                   </button>
-
-                  {/* Logout */}
                   <button
                     onClick={() => signOut({ callbackUrl: "/" })}
                     className={`flex items-center gap-2 w-full text-left px-4 py-2 rounded text-sm font-medium transition ${
                       theme === "dark"
-                        ? "bg-gray-700 hover:bg-gray-600 text-white"
-                        : "bg-gray-200 hover:bg-gray-300 text-gray-900"
+                        ? "bg-neutral-700 hover:bg-neutral-600 text-white"
+                        : "bg-neutral-200 hover:bg-neutral-300 text-neutral-900"
                     }`}
                   >
                     <LuLogOut />
@@ -114,7 +118,7 @@ const Header = () => {
         ) : (
           <button
             onClick={() => signIn("google", { callbackUrl: "/" })}
-            className="bg-gray-200 text-gray-900 px-4 py-1.5 rounded hover:bg-gray-300 transition text-sm font-medium cursor-pointer"
+            className="bg-neutral-200 text-neutral-900 px-4 py-1.5 rounded hover:bg-neutral-300 transition text-sm font-medium cursor-pointer"
           >
             Sign In
           </button>
