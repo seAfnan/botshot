@@ -44,7 +44,7 @@ export async function GET(
       return NextResponse.json({ error: "Chat not found" }, { status: 404 });
     }
 
-    const formattedMessages = chat.messages.map((message) => ({
+    const formattedMessages = chat.messages.map((message: any) => ({
       id: message.id,
       sender: message.sender,
       role: message.role,
