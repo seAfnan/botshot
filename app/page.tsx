@@ -73,6 +73,15 @@ const Dashboard = () => {
     }
   }, [selectedAPI]);
 
+  // Show login modal on page load if user is not authenticated
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      setShowLoginModal(true);
+    } else if (status === "authenticated") {
+      setShowLoginModal(false);
+    }
+  }, [status]);
+
   useEffect(() => {
     if (session) {
       fetchChats();
@@ -429,74 +438,76 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div
-      className={`flex flex-col h-screen ${
-        theme === "dark" ? "bg-neutral-800" : "bg-neutral-50"
-      }`}
-    >
-      <Header
-        session={session}
-        status={status}
-        theme={theme}
-        switchDark={switchDark}
-        switchLight={switchLight}
-        dropdownOpen={dropdownOpen}
-        setDropdownOpen={setDropdownOpen}
-        dropdownRef={dropdownRef}
-      />
-      <div className="flex flex-grow overflow-auto relative">
-        <Sidebar
-          sidebarOpen={sidebarOpen}
-          setSidebarOpen={setSidebarOpen}
-          theme={theme}
-          chats={chats}
-          activeChat={activeChat}
-          createNewChat={createNewChat}
-          setActiveChat={setActiveChat}
-          fetchChatMessages={fetchChatMessages}
-          deleteChat={deleteChat}
-          editingChatId={editingChatId}
-          editTitle={editTitle}
-          setEditTitle={setEditTitle}
-          startEditingTitle={startEditingTitle}
-          saveTitle={saveTitle}
-          cancelEditing={cancelEditing}
-        />
-        <ChatArea
-          activeChat={activeChat}
-          chatMessagesRef={chatMessagesRef}
-          theme={theme}
+    <>
+      <div
+        className={`flex flex-col h-screen ${
+          theme === "dark" ? "bg-neutral-800" : "bg-neutral-50"
+        } ${showLoginModal ? "blur-sm" : ""}`}
+      >
+        <Header
           session={session}
           status={status}
-          loading={loading}
-          messageRef={messageRef}
-          selectedFile={selectedFile}
-          setSelectedFile={setSelectedFile}
-          selectedAPI={selectedAPI}
-          setSelectedAPI={setSelectedAPI}
-          selectedLLM={selectedLLM}
-          setSelectedLLM={setSelectedLLM}
-          apiOptions={apiOptions}
-          getLLMOptions={getLLMOptions}
-          fileInputRef={fileInputRef}
-          textareaRef={textareaRef}
-          handleSendMessage={handleSendMessage}
+          theme={theme}
+          switchDark={switchDark}
+          switchLight={switchLight}
+          dropdownOpen={dropdownOpen}
+          setDropdownOpen={setDropdownOpen}
+          dropdownRef={dropdownRef}
         />
-        {sidebarOpen && (
-          <div
-            className="md:hidden fixed inset-0 bg-opacity-50 z-30"
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
-        {showLoginModal && (
-          <LoginModal
+        <div className="flex flex-grow overflow-auto relative">
+          <Sidebar
+            sidebarOpen={sidebarOpen}
+            setSidebarOpen={setSidebarOpen}
             theme={theme}
-            setShowLoginModal={setShowLoginModal}
-            handleGoogleLogin={() => signIn("google", { callbackUrl: "/" })}
+            chats={chats}
+            activeChat={activeChat}
+            createNewChat={createNewChat}
+            setActiveChat={setActiveChat}
+            fetchChatMessages={fetchChatMessages}
+            deleteChat={deleteChat}
+            editingChatId={editingChatId}
+            editTitle={editTitle}
+            setEditTitle={setEditTitle}
+            startEditingTitle={startEditingTitle}
+            saveTitle={saveTitle}
+            cancelEditing={cancelEditing}
           />
-        )}
+          <ChatArea
+            activeChat={activeChat}
+            chatMessagesRef={chatMessagesRef}
+            theme={theme}
+            session={session}
+            status={status}
+            loading={loading}
+            messageRef={messageRef}
+            selectedFile={selectedFile}
+            setSelectedFile={setSelectedFile}
+            selectedAPI={selectedAPI}
+            setSelectedAPI={setSelectedAPI}
+            selectedLLM={selectedLLM}
+            setSelectedLLM={setSelectedLLM}
+            apiOptions={apiOptions}
+            getLLMOptions={getLLMOptions}
+            fileInputRef={fileInputRef}
+            textareaRef={textareaRef}
+            handleSendMessage={handleSendMessage}
+          />
+          {sidebarOpen && (
+            <div
+              className="md:hidden fixed inset-0 bg-opacity-50 z-30"
+              onClick={() => setSidebarOpen(false)}
+            />
+          )}
+        </div>
       </div>
-    </div>
+      {showLoginModal && (
+        <LoginModal
+          theme={theme}
+          setShowLoginModal={setShowLoginModal}
+          handleGoogleLogin={() => signIn("google", { callbackUrl: "/" })}
+        />
+      )}
+    </>
   );
 };
 

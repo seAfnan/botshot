@@ -114,6 +114,29 @@ const Sidebar: React.FC<SidebarProps> = ({
               />
             ))}
           </div>
+          {/* Legal Links */}
+          <div className="mt-auto px-3 pb-4 text-xs space-y-1 flex gap-2">
+            <a
+              href="/terms-of-service"
+              className={`block transition-colors hover:underline ${
+                theme === "dark"
+                  ? "text-neutral-400 hover:text-white"
+                  : "text-neutral-700 hover:text-black"
+              }`}
+            >
+              Terms of Service
+            </a>
+            <a
+              href="/privacy-policy"
+              className={`block transition-colors hover:underline ${
+                theme === "dark"
+                  ? "text-neutral-400 hover:text-white"
+                  : "text-neutral-700 hover:text-black"
+              }`}
+            >
+              Privacy Policy
+            </a>
+          </div>
         </div>
       </div>
     </>

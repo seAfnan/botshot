@@ -118,7 +118,7 @@ const Header: React.FC<HeaderProps> = ({
         ) : (
           <button
             onClick={() => signIn("google", { callbackUrl: "/" })}
-            className="bg-neutral-200 text-neutral-900 px-4 py-1.5 rounded hover:bg-neutral-300 transition text-sm font-medium cursor-pointer"
+            className="bg-neutral-200 text-neutral-900 px-4 py-1.5 rounded hover:bg-neutral-300 transition text-sm font-medium cursor-pointer sr-only"
           >
             Sign In
           </button>
