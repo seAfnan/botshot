@@ -517,11 +517,7 @@ const Dashboard = () => {
         </div>
       </div>
       {showLoginModal && (
-        <LoginModal
-          theme={theme}
-          setShowLoginModal={setShowLoginModal}
-          handleGoogleLogin={() => signIn("google", { callbackUrl: "/" })}
-        />
+        <LoginModal theme={theme} setShowLoginModal={setShowLoginModal} />
       )}
     </>
   );
