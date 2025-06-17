@@ -313,7 +313,19 @@ const Dashboard = () => {
                   };
                 });
 
-                fetchChats();
+                // Update the chat in the chats list with the new last message
+                setChats((prevChats) =>
+                  prevChats.map((chat) =>
+                    chat.id === activeChat.id
+                      ? {
+                          ...chat,
+                          lastMessage:
+                            data.botMessage.content.slice(0, 100) + "...", // Truncate for preview
+                        }
+                      : chat
+                  )
+                );
+                // fetchChats();
               } else if (data.type === "error") {
                 setActiveChat((prev) => {
                   if (!prev) return null;
