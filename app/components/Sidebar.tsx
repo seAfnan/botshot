@@ -83,7 +83,9 @@ const Sidebar: React.FC<SidebarProps> = ({
         className={`${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0 fixed md:relative z-40 w-[200px] md:w-[15%] h-full ${
-          theme === "dark" ? "bg-neutral-900/70" : "bg-neutral-200"
+          theme === "dark"
+            ? "bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950"
+            : "bg-neutral-200"
         } text-white transition-transform duration-300 ease-in-out`}
       >
         <div className="flex flex-col h-full">

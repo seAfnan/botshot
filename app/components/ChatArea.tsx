@@ -103,7 +103,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   }, []);
 
   return (
-    <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full md:w-[70%] relative">
+    <div className="flex-1 flex flex-col max-w-5xl mx-auto w-full md:w-[70%] relative">
       <div
         ref={chatMessagesRef}
         className="flex-1 overflow-y-auto p-4 space-y-4 overflow-auto"

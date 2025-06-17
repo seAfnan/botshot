@@ -503,7 +503,9 @@ const Dashboard = () => {
     <>
       <div
         className={`flex flex-col h-screen ${
-          theme === "dark" ? "bg-neutral-800" : "bg-neutral-50"
+          theme === "dark"
+            ? "bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950"
+            : "bg-neutral-50"
         } ${showLoginModal ? "blur-sm" : ""}`}
       >
         <Header

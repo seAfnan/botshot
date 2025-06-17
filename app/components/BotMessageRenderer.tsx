@@ -331,10 +331,12 @@ const MessageRenderer: React.FC<MessageRendererProps> = ({
                 customStyle={{
                   margin: 0,
                   borderRadius: 0,
-                  fontSize: "0.875rem",
                   lineHeight: "1.6",
                   padding: "1.25rem",
                   backgroundColor: theme === "dark" ? "#1e1e1e" : "#f8f9fa",
+                }}
+                codeTagProps={{
+                  style: { fontSize: "1rem" }, // <-- Add this prop
                 }}
                 showLineNumbers={cleanCodeString.split("\n").length > 5}
                 wrapLines={true}

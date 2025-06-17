@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { LuLogOut } from "react-icons/lu";
 import { FaMoon } from "react-icons/fa";
 import { MdSunny } from "react-icons/md";
+import Link from "next/link";
 
 interface HeaderProps {
   session: Session | null;
@@ -34,20 +35,21 @@ const Header: React.FC<HeaderProps> = ({
     <header
       className={`w-full flex items-center justify-between px-6 py-2 pb-0 shadow-md transition-colors duration-300 ${
         theme === "dark"
-          ? "bg-neutral-900/70 text-white"
+          ? "bg-gradient-to-b from-gray-950/70 via-gray-950/50 to-gray-900/10"
           : "bg-neutral-200 text-neutral-900"
       }`}
     >
-      <div
-        className={`text-3xl font-semibold tracking-tight bg-clip-text text-transparent bg-gradient-to-r ${
-          theme === "dark"
-            ? "from-pink-400 via-purple-400 to-blue-400"
-            : "from-blue-600 via-purple-600 to-pink-600"
-        }
-        `}
-      >
-        Botshot
-      </div>
+      <Link href="/">
+        <div
+          className={`cursor-pointer text-3xl font-semibold tracking-tight bg-clip-text text-transparent bg-gradient-to-r ${
+            theme === "dark"
+              ? "from-pink-400 via-purple-400 to-blue-400"
+              : "from-blue-600 via-purple-600 to-pink-600"
+          }`}
+        >
+          Botshot
+        </div>
+      </Link>
 
       <div className="flex items-center gap-4 relative">
         {status === "authenticated" && user ? (
