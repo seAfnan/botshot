@@ -208,6 +208,13 @@ const Sidebar: React.FC<SidebarProps> = ({
             >
               Terms of Service
             </a>
+            <span
+              className={
+                theme === "dark" ? "text-neutral-600" : "text-gray-400"
+              }
+            >
+              •
+            </span>
             <a
               href="/privacy-policy"
               className={`block transition-colors hover:underline ${
