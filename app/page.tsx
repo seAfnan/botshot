@@ -29,6 +29,13 @@ const Dashboard = () => {
   const messageRef = useRef("");
   const [isInitialized, setIsInitialized] = useState(false);
 
+  // New loading states
+  const [isCreatingChat, setIsCreatingChat] = useState(false);
+  const [loadingChatId, setLoadingChatId] = useState<string | null>(null);
+  const [deletingChatId, setDeletingChatId] = useState<string | null>(null);
+  const [isUpdatingTitle, setIsUpdatingTitle] = useState(false);
+  const [isLoadingChats, setIsLoadingChats] = useState(false);
+
   const getLLMOptions = () => {
     switch (selectedAPI) {
       case "groq":
@@ -102,6 +109,7 @@ const Dashboard = () => {
   }, [activeChat?.messages]);
 
   const fetchChats = async () => {
+    setIsLoadingChats(true);
     try {
       const response = await fetch("/api/chats");
       if (response.ok) {
@@ -119,10 +127,13 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.error("Error fetching chats:", error);
+    } finally {
+      setIsLoadingChats(false);
     }
   };
 
   const createNewChatInternal = async () => {
+    setIsCreatingChat(true);
     try {
       const response = await fetch("/api/chats", {
         method: "POST",
@@ -135,10 +146,13 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.error("Error creating new chat:", error);
+    } finally {
+      setIsCreatingChat(false);
     }
   };
 
   const fetchChatMessages = async (chatId: string) => {
+    setLoadingChatId(chatId);
     try {
       const response = await fetch(`/api/chats/${chatId}`);
       if (response.ok) {
@@ -147,6 +161,8 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.error("Error fetching chat messages:", error);
+    } finally {
+      setLoadingChatId(null);
     }
   };
 
@@ -374,6 +390,7 @@ const Dashboard = () => {
   const deleteChat = async (chatId: string, e: React.MouseEvent) => {
     e.stopPropagation();
 
+    setDeletingChatId(chatId);
     try {
       const response = await fetch(`/api/chats/${chatId}`, {
         method: "DELETE",
@@ -394,6 +411,8 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.error("Error deleting chat:", error);
+    } finally {
+      setDeletingChatId(null);
     }
   };
 
@@ -406,6 +425,7 @@ const Dashboard = () => {
   const saveTitle = async () => {
     if (!editingChatId || !editTitle.trim()) return;
 
+    setIsUpdatingTitle(true);
     try {
       const response = await fetch(`/api/chats/${editingChatId}`, {
         method: "PATCH",
@@ -434,6 +454,7 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Error updating chat title:", error);
     } finally {
+      setIsUpdatingTitle(false);
       setEditingChatId(null);
       setEditTitle("");
     }
@@ -500,6 +521,12 @@ const Dashboard = () => {
             startEditingTitle={startEditingTitle}
             saveTitle={saveTitle}
             cancelEditing={cancelEditing}
+            // Pass loading states to Sidebar
+            isCreatingChat={isCreatingChat}
+            loadingChatId={loadingChatId}
+            deletingChatId={deletingChatId}
+            isUpdatingTitle={isUpdatingTitle}
+            isLoadingChats={isLoadingChats}
           />
           <ChatArea
             activeChat={activeChat}
@@ -520,6 +547,8 @@ const Dashboard = () => {
             fileInputRef={fileInputRef}
             textareaRef={textareaRef}
             handleSendMessage={handleSendMessage}
+            // Pass loading state to ChatArea
+            loadingChatId={loadingChatId}
           />
           {sidebarOpen && (
             <div

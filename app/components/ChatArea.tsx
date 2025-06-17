@@ -27,6 +27,7 @@ interface ChatAreaProps {
   fileInputRef: RefObject<HTMLInputElement | null>;
   textareaRef: RefObject<HTMLTextAreaElement | null>;
   handleSendMessage: () => void;
+  loadingChatId?: string | null;
 }
 
 const ChatArea: React.FC<ChatAreaProps> = ({
@@ -48,6 +49,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   fileInputRef,
   textareaRef,
   handleSendMessage,
+  loadingChatId,
 }) => {
   const user = session?.user;
   const [showScrollButton, setShowScrollButton] = useState(false);
@@ -107,6 +109,9 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         className="flex-1 overflow-y-auto p-4 space-y-4 overflow-auto"
         style={{ paddingBottom: "180px" }}
       >
+        {loadingChatId && (
+          <div className="text-center">Loading chat messages...</div>
+        )}
         {activeChat?.messages?.map((msg) => (
           <div
             key={msg.id}
