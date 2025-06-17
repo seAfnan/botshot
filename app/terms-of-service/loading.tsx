@@ -10,7 +10,7 @@ const Loading = () => {
       className={`min-h-screen flex flex-col items-center justify-center ${
         theme === "dark"
           ? "bg-gradient-to-b from-black via-[#121212] to-gray-900 text-white"
-          : "bg-gradient-to-b from-indigo-400 via-indigo-200 to-indigo-300 text-black"
+          : "bg-gradient-to-b from-indigo-100 via-indigo-100 to-indigo-100 text-black"
       }`}
     >
       Loading...
