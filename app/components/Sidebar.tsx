@@ -115,7 +115,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             ))}
           </div>
           {/* Legal Links */}
-          <div className="mt-auto px-3 pb-4 text-xs space-y-1 flex gap-2">
+          <div className="mt-auto px-3 pb-4 text-xs space-y-1 flex gap-3">
             <a
               href="/terms-of-service"
               className={`block transition-colors hover:underline ${

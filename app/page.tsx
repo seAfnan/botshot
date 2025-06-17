@@ -107,15 +107,34 @@ const Dashboard = () => {
       if (response.ok) {
         const fetchedChats = await response.json();
         setChats(fetchedChats);
-        if (fetchedChats.length > 0 && !activeChat) {
+
+        // If no chats exist, create a new one
+        if (fetchedChats.length === 0) {
+          await createNewChatInternal(); // Use internal version that doesn't check auth
+        } else if (!activeChat) {
+          // If chats exist but no active chat, set the first one as active
           setActiveChat(fetchedChats[0]);
-          fetchChatMessages(fetchedChats[0].id);
-        } else if (fetchedChats.length === 0) {
-          createNewChat();
+          await fetchChatMessages(fetchedChats[0].id);
         }
       }
     } catch (error) {
       console.error("Error fetching chats:", error);
+    }
+  };
+
+  const createNewChatInternal = async () => {
+    try {
+      const response = await fetch("/api/chats", {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        const newChat = await response.json();
+        setChats((prev) => [newChat, ...prev]);
+        setActiveChat({ ...newChat, messages: [] });
+      }
+    } catch (error) {
+      console.error("Error creating new chat:", error);
     }
   };
 
@@ -130,6 +149,12 @@ const Dashboard = () => {
       console.error("Error fetching chat messages:", error);
     }
   };
+
+  useEffect(() => {
+    if (status === "authenticated" && isInitialized) {
+      fetchChats();
+    }
+  }, [status, isInitialized]);
 
   const handleSendMessage = async () => {
     if (status !== "authenticated") {
@@ -342,20 +367,8 @@ const Dashboard = () => {
       return;
     }
 
-    try {
-      const response = await fetch("/api/chats", {
-        method: "POST",
-      });
-
-      if (response.ok) {
-        const newChat = await response.json();
-        setChats((prev) => [newChat, ...prev]);
-        setActiveChat({ ...newChat, messages: [] });
-        setSidebarOpen(false);
-      }
-    } catch (error) {
-      console.error("Error creating new chat:", error);
-    }
+    await createNewChatInternal();
+    setSidebarOpen(false);
   };
 
   const deleteChat = async (chatId: string, e: React.MouseEvent) => {
