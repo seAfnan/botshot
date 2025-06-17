@@ -57,9 +57,9 @@ const Dashboard = () => {
         ];
       case "anthropic":
         return [
-          { value: "claude-3-opus", label: "Claude 3 Opus" },
-          { value: "claude-3-sonnet", label: "Claude 3 Sonnet" },
-          { value: "claude-3-haiku", label: "Claude 3 Haiku" },
+          { value: "claude-3-5-sonnet-20241022", label: "Claude 3.5 Sonnet" },
+          { value: "claude-3-5-haiku-20241022", label: "Claude 3.5 Haiku" },
+          { value: "claude-sonnet-4-20250514", label: "Claude Sonnet 4" },
         ];
       default:
         return [{ value: "llama2", label: "Llama 2" }];

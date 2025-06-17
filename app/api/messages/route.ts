@@ -278,15 +278,18 @@ const handleAnthropicAPI: APIHandler = async (
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
-      model: selectedLLM,
-      max_tokens: 2048,
+      model: selectedLLM, // Use "claude-3-5-sonnet-20241022" or "claude-sonnet-4-20250514"
+      max_tokens: 4096,
       messages: [{ role: "user", content: message }],
       stream: true,
     }),
   });
 
   if (!response.ok) {
-    throw new Error("Anthropic API request failed");
+    const errorText = await response.text();
+    throw new Error(
+      `Anthropic API request failed: ${response.status} - ${errorText}`
+    );
   }
 
   const reader = response.body?.getReader();
@@ -296,25 +299,28 @@ const handleAnthropicAPI: APIHandler = async (
 
   const decoder = new TextDecoder();
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
 
-    const chunk = decoder.decode(value);
-    const lines = chunk
-      .split("\n")
-      .filter((line) => line.trim().startsWith("data: "));
+      const chunk = decoder.decode(value, { stream: true });
+      const lines = chunk
+        .split("\n")
+        .filter((line) => line.trim().startsWith("data: "));
 
-    for (const line of lines) {
-      const data = line.replace("data: ", "");
-      if (data === "[DONE]") return aiResponse;
+      for (const line of lines) {
+        const data = line.replace("data: ", "").trim();
 
-      try {
-        const parsed: AnthropicResponse = JSON.parse(data);
-        if (parsed.type === "content_block_delta") {
-          const content = parsed.delta?.text || "";
+        // Skip empty lines or done signals
+        if (!data || data === "[DONE]") continue;
 
-          if (content) {
+        try {
+          const parsed: AnthropicResponse = JSON.parse(data);
+
+          // Handle content chunks
+          if (parsed.type === "content_block_delta" && parsed.delta?.text) {
+            const content = parsed.delta.text;
             aiResponse += content;
 
             const sseData: StreamChunk = {
@@ -327,11 +333,19 @@ const handleAnthropicAPI: APIHandler = async (
               encoder.encode(`data: ${JSON.stringify(sseData)}\n\n`)
             );
           }
+
+          // Handle message completion
+          if (parsed.type === "message_stop") {
+            break;
+          }
+        } catch (parseError) {
+          console.error("Error parsing Anthropic response:", parseError);
+          // Continue processing other chunks
         }
-      } catch (parseError) {
-        console.error("Error parsing Anthropic response:", parseError);
       }
     }
+  } finally {
+    reader.releaseLock();
   }
 
   return aiResponse;
