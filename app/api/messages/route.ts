@@ -44,6 +44,9 @@ interface OpenAIResponse {
     delta?: {
       content?: string;
     };
+    message?: {
+      content?: string;
+    };
   }>;
 }
 
@@ -190,40 +193,64 @@ const handleOpenAIAPI: APIHandler = async (
 
   const decoder = new TextDecoder();
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
 
-    const chunk = decoder.decode(value);
-    const lines = chunk
-      .split("\n")
-      .filter((line) => line.trim().startsWith("data: "));
+      const chunk = decoder.decode(value, { stream: true });
+      const lines = chunk
+        .split("\n")
+        .filter(
+          (line) => line.trim() !== "" && line.trim().startsWith("data: ")
+        );
 
-    for (const line of lines) {
-      const data = line.replace("data: ", "");
-      if (data === "[DONE]") return aiResponse;
+      for (const line of lines) {
+        const data = line.replace("data: ", "").trim();
 
-      try {
-        const parsed: OpenAIResponse = JSON.parse(data);
-        const content = parsed.choices?.[0]?.delta?.content || "";
-
-        if (content) {
-          aiResponse += content;
-
-          const sseData: StreamChunk = {
-            type: "chunk",
-            content: content,
-            accumulated: aiResponse,
-          };
-
-          controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify(sseData)}\n\n`)
-          );
+        if (data === "[DONE]") {
+          return aiResponse;
         }
-      } catch (parseError) {
-        console.error("Error parsing OpenAI response:", parseError);
+
+        // Skip empty data lines
+        if (!data) continue;
+
+        try {
+          const parsed: OpenAIResponse = JSON.parse(data);
+
+          // For streaming responses, content is in delta.content
+          // For non-streaming responses, content is in message.content
+          const content =
+            parsed.choices?.[0]?.delta?.content ||
+            parsed.choices?.[0]?.message?.content ||
+            "";
+
+          if (content) {
+            aiResponse += content;
+            const sseData: StreamChunk = {
+              type: "chunk",
+              content: content,
+              accumulated: aiResponse,
+            };
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify(sseData)}\n\n`)
+            );
+          }
+        } catch (parseError) {
+          console.error(
+            "Error parsing OpenAI response chunk:",
+            parseError,
+            "Data:",
+            data
+          );
+          // Continue processing other chunks even if one fails
+          continue;
+        }
       }
     }
+  } finally {
+    // Ensure reader is always released
+    reader.releaseLock();
   }
 
   return aiResponse;
