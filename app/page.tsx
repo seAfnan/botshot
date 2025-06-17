@@ -27,6 +27,7 @@ const Dashboard = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef("");
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const getLLMOptions = () => {
     switch (selectedAPI) {
@@ -75,18 +76,24 @@ const Dashboard = () => {
 
   // Show login modal on page load if user is not authenticated
   useEffect(() => {
-    if (status === "unauthenticated") {
-      setShowLoginModal(true);
-    } else if (status === "authenticated") {
-      setShowLoginModal(false);
-    }
-  }, [status]);
+    let timeoutId;
 
-  useEffect(() => {
-    if (session) {
-      fetchChats();
+    if (status === "loading") {
+      setIsInitialized(false);
+      return;
     }
-  }, [session]);
+
+    timeoutId = setTimeout(() => {
+      setIsInitialized(true);
+      if (status === "unauthenticated") {
+        setShowLoginModal(true);
+      } else if (status === "authenticated") {
+        setShowLoginModal(false);
+      }
+    }, 200);
+
+    return () => clearTimeout(timeoutId);
+  }, [status]);
 
   useEffect(() => {
     if (chatMessagesRef.current) {
@@ -436,6 +443,15 @@ const Dashboard = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Add this early return
+  if (!isInitialized) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
     <>
