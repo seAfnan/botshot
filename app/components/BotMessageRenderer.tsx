@@ -325,35 +325,26 @@ const MessageRenderer: React.FC<MessageRendererProps> = ({
 
             {/* Code block with distinct background */}
             <div className="relative">
-              <SyntaxHighlighter
-                style={theme === "dark" ? vscDarkPlus : vs}
-                language={language}
-                PreTag="div"
-                className="!mt-0 !rounded-none"
-                customStyle={{
-                  margin: 0,
-                  borderRadius: 0,
-                  lineHeight: "1.6",
-                  padding: "1.25rem",
-                  backgroundColor: theme === "dark" ? "#1e1e1e" : "#f8f9fa",
-                  fontSize: "0.875rem", // text-sm equivalent
-                  "@media (min-width: 1024px)": {
-                    fontSize: "1rem", // lg:text-base equivalent
-                    fontWeight: "300", // lg:font-light equivalent
-                  },
-                }}
-                codeTagProps={{
-                  style: {
-                    fontSize: "0.875rem", // text-sm
-                    fontWeight: "normal",
-                  },
-                }}
-                showLineNumbers={cleanCodeString.split("\n").length > 5}
-                wrapLines={true}
-                {...props}
-              >
-                {cleanCodeString}
-              </SyntaxHighlighter>
+              <div className="text-sm lg:font-light lg:text-base">
+                <SyntaxHighlighter
+                  style={theme === "dark" ? vscDarkPlus : vs}
+                  language={language}
+                  PreTag="div"
+                  className="!mt-0 !rounded-none !text-sm lg:!font-light lg:!text-base"
+                  customStyle={{
+                    margin: 0,
+                    borderRadius: 0,
+                    lineHeight: "1.6",
+                    padding: "1.25rem",
+                    backgroundColor: theme === "dark" ? "#1e1e1e" : "#f8f9fa",
+                  }}
+                  showLineNumbers={cleanCodeString.split("\n").length > 5}
+                  wrapLines={true}
+                  {...props}
+                >
+                  {cleanCodeString}
+                </SyntaxHighlighter>
+              </div>
             </div>
           </div>
         );
