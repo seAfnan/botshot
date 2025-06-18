@@ -266,7 +266,7 @@ const MessageRenderer: React.FC<MessageRendererProps> = ({
           // Treat as inline code instead
           return (
             <code
-              className={`px-2 py-1 rounded-md text-sm font-mono ${
+              className={`px-2 py-1 rounded-md text-sm lg:font-light lg:text-base font-mono ${
                 theme === "dark"
                   ? "bg-neutral-800 text-red-300 border border-neutral-700"
                   : "bg-red-50 text-red-700 border border-red-200"
@@ -282,7 +282,7 @@ const MessageRenderer: React.FC<MessageRendererProps> = ({
           <div className="relative group my-6 rounded-lg overflow-hidden border shadow-sm">
             {/* Header with language/filename and copy button */}
             <div
-              className={`flex items-center justify-between px-4 py-0.5 text-sm font-medium ${
+              className={`flex items-center justify-between px-4 py-0.5 text-sm lg:font-light lg:text-base font-medium ${
                 theme === "dark"
                   ? `${languageInfo.bgColor} border-b border-neutral-700`
                   : `${languageInfo.bgColor} border-b border-neutral-200`
@@ -293,14 +293,16 @@ const MessageRenderer: React.FC<MessageRendererProps> = ({
                   {filename || languageInfo.name}
                 </span>
                 {filename && (
-                  <span className={`text-xs opacity-70 ${languageInfo.color}`}>
+                  <span
+                    className={`text-xs lg:text-sm opacity-70 ${languageInfo.color}`}
+                  >
                     {languageInfo.name}
                   </span>
                 )}
               </div>
               <button
                 onClick={() => copyToClipboard(codeStr, codeId)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs lg:text-sm font-medium transition-all duration-200 ${
                   theme === "dark"
                     ? "hover:bg-neutral-700 text-neutral-400 hover:text-neutral-200 border border-transparent hover:border-neutral-600"
                     : "hover:bg-neutral-200 text-neutral-500 hover:text-neutral-700 border border-transparent hover:border-neutral-300"
@@ -334,9 +336,17 @@ const MessageRenderer: React.FC<MessageRendererProps> = ({
                   lineHeight: "1.6",
                   padding: "1.25rem",
                   backgroundColor: theme === "dark" ? "#1e1e1e" : "#f8f9fa",
+                  fontSize: "0.875rem", // text-sm equivalent
+                  "@media (min-width: 1024px)": {
+                    fontSize: "1rem", // lg:text-base equivalent
+                    fontWeight: "300", // lg:font-light equivalent
+                  },
                 }}
                 codeTagProps={{
-                  style: { fontSize: "1rem" }, // <-- Add this prop
+                  style: {
+                    fontSize: "0.875rem", // text-sm
+                    fontWeight: "normal",
+                  },
                 }}
                 showLineNumbers={cleanCodeString.split("\n").length > 5}
                 wrapLines={true}
@@ -359,7 +369,7 @@ const MessageRenderer: React.FC<MessageRendererProps> = ({
           // Treat as inline code instead
           return (
             <code
-              className={`px-2 py-1 rounded-md text-sm font-mono ${
+              className={`px-2 py-1 rounded-md text-sm lg:font-light lg:text-base font-mono ${
                 theme === "dark"
                   ? "bg-neutral-800 text-red-300 border border-neutral-700"
                   : "bg-red-50 text-red-700 border border-red-200"
@@ -378,7 +388,7 @@ const MessageRenderer: React.FC<MessageRendererProps> = ({
             }`}
           >
             <div
-              className={`flex items-center justify-between px-4 py-0.5 text-sm font-medium ${
+              className={`flex items-center justify-between px-4 py-0.5 text-sm lg:font-light lg:text-base font-medium ${
                 theme === "dark"
                   ? "bg-gradient-to-r from-neutral-800 to-neutral-700 text-neutral-300 border-b border-neutral-600"
                   : "bg-gradient-to-r from-neutral-100 to-neutral-50 text-neutral-600 border-b border-neutral-200"
@@ -393,7 +403,7 @@ const MessageRenderer: React.FC<MessageRendererProps> = ({
               </span>
               <button
                 onClick={() => copyToClipboard(cleanCodeString, codeId)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs lg:text-sm font-medium transition-all duration-200 ${
                   theme === "dark"
                     ? "hover:bg-neutral-700 text-neutral-400 hover:text-neutral-200 border border-transparent hover:border-neutral-600"
                     : "hover:bg-neutral-200 text-neutral-500 hover:text-neutral-700 border border-transparent hover:border-neutral-300"
@@ -415,7 +425,7 @@ const MessageRenderer: React.FC<MessageRendererProps> = ({
             </div>
 
             <div
-              className={`p-5 font-mono text-sm overflow-x-auto ${
+              className={`p-5 font-mono text-sm lg:font-light lg:text-base overflow-x-auto ${
                 theme === "dark"
                   ? "bg-neutral-900/70 text-neutral-300 border-t border-neutral-700"
                   : "bg-gray-50 text-neutral-700 border-t border-neutral-200"
@@ -432,7 +442,7 @@ const MessageRenderer: React.FC<MessageRendererProps> = ({
       // Inline code with better contrast
       return (
         <code
-          className={`px-2 py-1 rounded-md text-sm font-mono ${
+          className={`px-2 py-1 rounded-md text-sm lg:font-light lg:text-base font-mono ${
             theme === "dark"
               ? "bg-neutral-800 text-red-300 border border-neutral-700"
               : "bg-red-50 text-red-700 border border-red-200"
@@ -447,7 +457,7 @@ const MessageRenderer: React.FC<MessageRendererProps> = ({
     // Enhanced headings
     h1: ({ children }) => (
       <h1
-        className={`text-2xl font-bold mb-4 pb-2 border-b ${
+        className={`text-lg lg:text-xl font-bold mb-4 pb-2 border-b ${
           theme === "dark"
             ? "text-neutral-100 border-neutral-600"
             : "text-neutral-900 border-neutral-300"
@@ -459,7 +469,7 @@ const MessageRenderer: React.FC<MessageRendererProps> = ({
 
     h2: ({ children }) => (
       <h2
-        className={`text-xl font-semibold mb-3 mt-6 ${
+        className={`text-base lg:text-lg font-semibold mb-3 mt-6 ${
           theme === "dark" ? "text-neutral-200" : "text-neutral-800"
         }`}
       >
@@ -469,7 +479,7 @@ const MessageRenderer: React.FC<MessageRendererProps> = ({
 
     h3: ({ children }) => (
       <h3
-        className={`text-lg font-medium mb-2 mt-4 ${
+        className={`text-sm lg:text-base font-medium mb-2 mt-4 ${
           theme === "dark" ? "text-neutral-300" : "text-neutral-700"
         }`}
       >
@@ -480,7 +490,7 @@ const MessageRenderer: React.FC<MessageRendererProps> = ({
     // Enhanced lists
     ul: ({ children }) => (
       <ul
-        className={`list-disc pl-6 mb-4 space-y-1 ${
+        className={`list-disc pl-6 mb-4 space-y-1 text-sm lg:font-light lg:text-base ${
           theme === "dark" ? "text-neutral-300" : "text-neutral-700"
         }`}
       >
@@ -490,7 +500,7 @@ const MessageRenderer: React.FC<MessageRendererProps> = ({
 
     ol: ({ children }) => (
       <ol
-        className={`list-decimal pl-6 mb-4 space-y-1 ${
+        className={`list-decimal pl-6 mb-4 space-y-1 text-sm lg:font-light lg:text-base ${
           theme === "dark" ? "text-neutral-300" : "text-neutral-700"
         }`}
       >
@@ -503,7 +513,7 @@ const MessageRenderer: React.FC<MessageRendererProps> = ({
     // Enhanced blockquotes
     blockquote: ({ children }) => (
       <blockquote
-        className={`border-l-4 pl-4 py-2 my-4 italic ${
+        className={`border-l-4 pl-4 py-2 my-4 italic text-sm lg:font-light lg:text-base ${
           theme === "dark"
             ? "border-blue-400 bg-neutral-800 text-neutral-300"
             : "border-blue-500 bg-blue-50 text-neutral-600"
@@ -517,7 +527,7 @@ const MessageRenderer: React.FC<MessageRendererProps> = ({
     table: ({ children }) => (
       <div className="overflow-x-auto my-4">
         <table
-          className={`min-w-full border-collapse border ${
+          className={`min-w-full border-collapse border text-sm lg:font-light lg:text-base ${
             theme === "dark" ? "border-neutral-600" : "border-neutral-300"
           }`}
         >
@@ -528,7 +538,7 @@ const MessageRenderer: React.FC<MessageRendererProps> = ({
 
     th: ({ children }) => (
       <th
-        className={`border px-4 py-2 text-left font-semibold ${
+        className={`border px-4 py-2 text-left font-semibold text-sm lg:font-light lg:text-base ${
           theme === "dark"
             ? "border-neutral-600 bg-neutral-700 text-neutral-200"
             : "border-neutral-300 bg-neutral-100 text-neutral-800"
@@ -540,7 +550,7 @@ const MessageRenderer: React.FC<MessageRendererProps> = ({
 
     td: ({ children }) => (
       <td
-        className={`border px-4 py-2 ${
+        className={`border px-4 py-2 text-sm lg:font-light lg:text-base ${
           theme === "dark"
             ? "border-neutral-600 text-neutral-300"
             : "border-neutral-300 text-neutral-700"
@@ -553,7 +563,7 @@ const MessageRenderer: React.FC<MessageRendererProps> = ({
     // Enhanced paragraphs
     p: ({ children }) => (
       <p
-        className={`mb-3 leading-relaxed ${
+        className={`mb-3 leading-relaxed text-sm lg:font-light lg:text-base ${
           theme === "dark" ? "text-neutral-300" : "text-neutral-700"
         }`}
       >
@@ -567,7 +577,7 @@ const MessageRenderer: React.FC<MessageRendererProps> = ({
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className={`underline font-medium transition-colors ${
+        className={`underline font-medium transition-colors text-sm lg:font-light lg:text-base ${
           theme === "dark"
             ? "text-blue-400 hover:text-blue-300"
             : "text-blue-600 hover:text-blue-800"

@@ -68,7 +68,7 @@ const ChatListItem: React.FC<ChatListItemProps> = ({
                 if (e.key === "Escape") cancelEditing();
               }}
               onBlur={saveTitle}
-              className={`flex-1 text-sm bg-transparent border rounded px-1 ${
+              className={`flex-1 text-xs sm:text-sm bg-transparent border rounded px-1 ${
                 theme === "dark"
                   ? "text-white border-neutral-600"
                   : "text-neutral-800 border-neutral-400"
@@ -104,7 +104,7 @@ const ChatListItem: React.FC<ChatListItemProps> = ({
           }`}
         >
           <div
-            className={`font-medium text-sm truncate ${
+            className={`lg:font-normal text-xs sm:text-sm truncate ${
               theme === "dark" ? "text-white" : "text-neutral-800"
             }`}
           >
@@ -114,7 +114,7 @@ const ChatListItem: React.FC<ChatListItemProps> = ({
             )}
           </div>
           <div
-            className={`text-xs mt-1 ${
+            className={`text-[10px] sm:text-xs mt-1 ${
               theme === "dark" ? "text-neutral-400" : "text-neutral-500"
             }`}
           >

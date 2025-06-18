@@ -59,7 +59,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     <>
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
-        className={`md:hidden fixed top-20 left-4 z-50 p-2 rounded-lg shadow-lg ${
+        className={`lg:hidden fixed top-20 left-4 z-50 p-2 rounded-lg border border-neutral-700 ${
           theme === "dark" ? "bg-neutral-900/70" : "bg-white"
         }`}
       >
@@ -82,7 +82,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div
         className={`${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 fixed md:relative z-40 w-[200px] md:w-[15%] h-full ${
+        } lg:translate-x-0 fixed lg:relative z-40 w-[200px] lg:w-[15%] h-full ${
           theme === "dark"
             ? "bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950"
             : "bg-neutral-200"
@@ -112,10 +112,13 @@ const Sidebar: React.FC<SidebarProps> = ({
                   <span className="font-medium">Creating...</span>
                 </>
               ) : (
-                <>
+                <div className="flex items-center gap-1.5">
                   <IoAdd size={16} />
-                  <span className="font-medium">New Chat</span>
-                </>
+                  <span className="flex gap-1 xs:font-thin xl:font-medium">
+                    New{" "}
+                    <span className="sm:block lg:hidden xl:block"> Chat</span>
+                  </span>
+                </div>
               )}
             </button>
           </div>
@@ -202,7 +205,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           </div>
 
           {/* Legal Links */}
-          <div className="mt-auto px-3 pb-4 text-xs space-y-1 flex gap-3">
+          <div className="mt-auto pl-3 pb-4 text-xs sm:space-y-1 flex lg:gap-0 xl:gap-3">
             <a
               href="/terms-of-service"
               className={`block transition-colors hover:underline ${
@@ -214,9 +217,9 @@ const Sidebar: React.FC<SidebarProps> = ({
               Terms of Service
             </a>
             <span
-              className={
+              className={`sm:hidden xl:block ${
                 theme === "dark" ? "text-neutral-600" : "text-gray-400"
-              }
+              }`}
             >
               •
             </span>
