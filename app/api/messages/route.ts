@@ -298,19 +298,27 @@ const handleAnthropicAPI: APIHandler = async (
   }
 
   const decoder = new TextDecoder();
+  let buffer = ""; // Buffer to accumulate incomplete chunks
 
   try {
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
 
-      const chunk = decoder.decode(value, { stream: true });
-      const lines = chunk
-        .split("\n")
-        .filter((line) => line.trim().startsWith("data: "));
+      // Decode and add to buffer
+      buffer += decoder.decode(value, { stream: true });
+
+      // Split by lines and process complete lines
+      const lines = buffer.split("\n");
+
+      // Keep the last line in buffer (might be incomplete)
+      buffer = lines.pop() || "";
 
       for (const line of lines) {
-        const data = line.replace("data: ", "").trim();
+        const trimmedLine = line.trim();
+        if (!trimmedLine.startsWith("data: ")) continue;
+
+        const data = trimmedLine.replace("data: ", "").trim();
 
         // Skip empty lines or done signals
         if (!data || data === "[DONE]") continue;
@@ -340,7 +348,37 @@ const handleAnthropicAPI: APIHandler = async (
           }
         } catch (parseError) {
           console.error("Error parsing Anthropic response:", parseError);
+          console.error("Problematic data:", data);
           // Continue processing other chunks
+        }
+      }
+    }
+
+    // Process any remaining data in buffer
+    if (buffer.trim()) {
+      const trimmedBuffer = buffer.trim();
+      if (trimmedBuffer.startsWith("data: ")) {
+        const data = trimmedBuffer.replace("data: ", "").trim();
+        if (data && data !== "[DONE]") {
+          try {
+            const parsed: AnthropicResponse = JSON.parse(data);
+            if (parsed.type === "content_block_delta" && parsed.delta?.text) {
+              const content = parsed.delta.text;
+              aiResponse += content;
+
+              const sseData: StreamChunk = {
+                type: "chunk",
+                content: content,
+                accumulated: aiResponse,
+              };
+
+              controller.enqueue(
+                encoder.encode(`data: ${JSON.stringify(sseData)}\n\n`)
+              );
+            }
+          } catch (parseError) {
+            console.error("Error parsing final buffer:", parseError);
+          }
         }
       }
     }

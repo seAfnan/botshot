@@ -87,6 +87,9 @@ const Sidebar: React.FC<SidebarProps> = ({
             ? "bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950"
             : "bg-neutral-200"
         } text-white transition-transform duration-300 ease-in-out`}
+        style={{
+          borderRight: theme === "dark" ? "0.5px solid #424242" : "",
+        }}
       >
         <div className="flex flex-col h-full">
           <div

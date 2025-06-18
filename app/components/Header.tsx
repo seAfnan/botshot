@@ -38,6 +38,9 @@ const Header: React.FC<HeaderProps> = ({
           ? "bg-gradient-to-b from-gray-950/70 via-gray-950/50 to-gray-900/10"
           : "bg-neutral-200 text-neutral-900"
       }`}
+      style={{
+        borderBottom: theme === "dark" ? "0.5px solid #424242" : "",
+      }}
     >
       <Link href="/">
         <div
