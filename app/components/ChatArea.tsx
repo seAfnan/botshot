@@ -229,7 +229,12 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                   theme === "dark" ? "text-neutral-600" : "text-neutral-300"
                 }`}
               />
-              <h3 className="text-lg font-medium mb-2">Start a conversation</h3>
+              <h3 className="text-lg font-medium mb-2">
+                How can I help you,{" "}
+                <span className="text-gray-800 dark:text-gray-200">
+                  {session?.user?.name}?
+                </span>
+              </h3>
               <p className="text-sm">
                 Send a message to begin chatting with your AI assistant
               </p>
