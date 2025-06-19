@@ -49,6 +49,7 @@ const Header: React.FC<HeaderProps> = ({
               ? "from-pink-400 via-purple-400 to-blue-400"
               : "from-blue-600 via-purple-600 to-pink-600"
           }`}
+          style={{ marginTop: "-0.8rem" }}
         >
           Botshot
         </div>

@@ -93,7 +93,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       >
         <div className="flex flex-col h-full">
           <div
-            className={`p-3 border-b pt-6 ${
+            className={`p-3 pt-3 ${
               theme === "dark" ? "border-neutral-700" : "border-neutral-300"
             }`}
           >
