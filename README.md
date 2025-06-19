@@ -32,7 +32,7 @@ Botshot is a flexible and intelligent AI chat interface that allows users to int
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/botshot.git
+git clone https://github.com/seAfnan/botshot.git
 cd botshot
 ```
 
