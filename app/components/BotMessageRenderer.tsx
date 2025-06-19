@@ -554,7 +554,7 @@ const MessageRenderer: React.FC<MessageRendererProps> = ({
     // Enhanced paragraphs
     p: ({ children }) => (
       <p
-        className={`mb-3 leading-relaxed text-sm lg:font-light lg:text-base ${
+        className={`mb-3 leading-relaxed text-sm lg:font-normal lg:text-base ${
           theme === "dark" ? "text-neutral-300" : "text-neutral-700"
         }`}
       >

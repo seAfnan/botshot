@@ -6,7 +6,7 @@ import React, {
   useState,
   useEffect,
 } from "react";
-import { IoAttach, IoSend, IoClose, IoChevronDown } from "react-icons/io5";
+import { IoSend, IoClose, IoChevronDown } from "react-icons/io5";
 
 interface MessageInputProps {
   theme?: string;
@@ -19,7 +19,6 @@ interface MessageInputProps {
   selectedLLM: string;
   setSelectedLLM: (llm: string) => void;
   apiOptions: { value: string; label: string }[];
-  getLLMOptions: () => { value: string; label: string }[];
   fileInputRef: RefObject<HTMLInputElement | null>;
   textareaRef: RefObject<HTMLTextAreaElement | null>;
   handleSendMessage: () => void;
@@ -36,45 +35,131 @@ const MessageInput: React.FC<MessageInputProps> = ({
   selectedLLM,
   setSelectedLLM,
   apiOptions,
-  getLLMOptions,
   fileInputRef,
   textareaRef,
   handleSendMessage,
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [hoveredProvider, setHoveredProvider] = useState<string | null>(null);
+  const [message, setMessage] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const selectedItemRef = useRef<HTMLDivElement>(null);
+  const isSelecting = useRef(false);
 
-  // Get LLM options for a specific API
+  // Define LLM options per API
   const getLLMOptionsForAPI = useCallback((apiValue: string) => {
-    switch (apiValue) {
-      case "groq":
-        return [
-          { value: "llama3-70b-8192", label: "Llama 3 70B" },
-          { value: "llama3-8b-8192", label: "Llama 3 8B" },
-        ];
-      case "local":
-        return [{ value: "llama2", label: "Llama 2" }];
-      case "huggingface":
-        return [
-          { value: "HuggingFaceH4/zephyr-7b-beta", label: "Zephyr 7B Beta" },
-        ];
-      case "openai":
-        return [
-          { value: "gpt-4", label: "GPT-4" },
-          { value: "gpt-4-turbo", label: "GPT-4 Turbo" },
-          { value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo" },
-        ];
-      case "anthropic":
-        return [
-          { value: "claude-3-5-sonnet-20241022", label: "Claude 3.5 Sonnet" },
-          { value: "claude-3-5-haiku-20241022", label: "Claude 3.5 Haiku" },
-          { value: "claude-sonnet-4-20250514", label: "Claude Sonnet 4" },
-        ];
-      default:
-        return [{ value: "llama2", label: "Llama 2" }];
-    }
+    const options: { value: string; label: string }[] = {
+      groq: [
+        { value: "llama3-70b-8192", label: "Llama 3 70B" },
+        { value: "llama3-8b-8192", label: "Llama 3 8B" },
+      ],
+      local: [{ value: "llama2", label: "Llama 2" }],
+      huggingface: [
+        { value: "HuggingFaceH4/zephyr-7b-beta", label: "Zephyr 7B Beta" },
+      ],
+      openai: [
+        { value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo" },
+        { value: "gpt-4", label: "GPT-4" },
+        { value: "gpt-4-turbo", label: "GPT-4 Turbo" },
+      ],
+      anthropic: [
+        { value: "claude-3-5-sonnet-20241022", label: "Claude 3.5 Sonnet" },
+        { value: "claude-3-5-haiku-20241022", label: "Claude 3.5 Haiku" },
+        { value: "claude-sonnet-4-20250514", label: "Claude Sonnet 4" },
+      ],
+    }[apiValue] || [{ value: "llama2", label: "Llama 2" }];
+    return options;
   }, []);
+
+  // Generate all provider-model combinations
+  const getAllCombinations = useCallback(() => {
+    const combinations: Array<{
+      id: string;
+      providerValue: string;
+      providerLabel: string;
+      modelValue: string;
+      modelLabel: string;
+      displayLabel: string;
+    }> = [];
+    apiOptions.forEach((provider) => {
+      const models = getLLMOptionsForAPI(provider.value);
+      models.forEach((model) => {
+        combinations.push({
+          id: `${provider.value}:${model.value}`,
+          providerValue: provider.value,
+          providerLabel: provider.label,
+          modelValue: model.value,
+          modelLabel: model.label,
+          displayLabel: `${provider.label} - ${model.label}`,
+        });
+      });
+    });
+    return combinations;
+  }, [apiOptions, getLLMOptionsForAPI]);
+
+  // Handle selection
+  const handleCombinationSelection = useCallback(
+    (id: string) => {
+      if (isSelecting.current) return;
+      isSelecting.current = true;
+
+      const combination = getAllCombinations().find((combo) => combo.id === id);
+      if (combination) {
+        setSelectedAPI(combination.providerValue);
+        setSelectedLLM(combination.modelValue);
+        if (combination.providerValue === "openai") {
+          console
+            .log
+            // `Selected OpenAI model: ${combination.modelLabel} (${combination.modelValue})`
+            ();
+        }
+      }
+
+      setIsDropdownOpen(false);
+      isSelecting.current = false;
+    },
+    [getAllCombinations, setSelectedAPI, setSelectedLLM]
+  );
+
+  // Validate selectedLLM
+  useEffect(() => {
+    const validLLMs = getLLMOptionsForAPI(selectedAPI).map((llm) => llm.value);
+    if (!validLLMs.includes(selectedLLM)) {
+      const defaultLLM = validLLMs[0] || "";
+      if (defaultLLM) {
+        console
+          .log
+          // `Invalid LLM ${selectedLLM} for ${selectedAPI}, setting to ${defaultLLM}`
+          ();
+        setSelectedLLM(defaultLLM);
+      }
+    }
+  }, [selectedAPI, selectedLLM, getLLMOptionsForAPI, setSelectedLLM]);
+
+  // Scroll to selected item
+  useEffect(() => {
+    if (isDropdownOpen && dropdownRef.current && selectedItemRef.current) {
+      const dropdown = dropdownRef.current.querySelector(
+        ".overflow-y-auto"
+      ) as HTMLElement;
+      const selectedItem = selectedItemRef.current;
+
+      if (dropdown && selectedItem) {
+        const itemOffsetTop = selectedItem.offsetTop;
+        const itemHeight = selectedItem.offsetHeight;
+        const dropdownHeight = dropdown.clientHeight;
+
+        // Position the selected item near the top of the dropdown
+        // Adjust this value to control how much padding you want above the selected item
+        const padding = 10;
+
+        // Set scrollTop to position the selected item at the top
+        dropdown.scrollTop = itemOffsetTop - padding;
+
+        // Optional: If you want to center the selected item instead, use:
+        // dropdown.scrollTop = itemOffsetTop - (dropdownHeight / 2) + (itemHeight / 2);
+      }
+    }
+  }, [isDropdownOpen]);
 
   // Click outside handler
   useEffect(() => {
@@ -84,69 +169,66 @@ const MessageInput: React.FC<MessageInputProps> = ({
         !dropdownRef.current.contains(event.target as Node)
       ) {
         setIsDropdownOpen(false);
-        setHoveredProvider(null);
       }
     };
-
     if (isDropdownOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isDropdownOpen]);
 
-  const handleProviderLLMSelection = useCallback(
-    (api: string, llm: string) => {
-      setSelectedAPI(api);
-      setSelectedLLM(llm);
-      setIsDropdownOpen(false);
-      setHoveredProvider(null);
-    },
-    [setSelectedAPI, setSelectedLLM]
-  );
-
-  const getCurrentCombinedValue = useCallback(() => {
-    return `${selectedAPI}:${selectedLLM}`;
-  }, [selectedAPI, selectedLLM]);
-
-  // Get display text for selected provider-model combination
-  const getDisplayText = useCallback(() => {
-    const providerLabel =
-      apiOptions.find((api) => api.value === selectedAPI)?.label || selectedAPI;
-    const modelLabel =
-      getLLMOptions().find((llm) => llm.value === selectedLLM)?.label ||
-      selectedLLM;
-    return { providerLabel, modelLabel };
-  }, [selectedAPI, selectedLLM, apiOptions, getLLMOptions]);
+  // Get current display text
+  const getCurrentDisplayText = useCallback(() => {
+    const provider = apiOptions.find((api) => api.value === selectedAPI);
+    const model = getLLMOptionsForAPI(selectedAPI).find(
+      (llm) => llm.value === selectedLLM
+    );
+    return {
+      provider: provider?.label || selectedAPI,
+      model: model?.label || selectedLLM,
+    };
+  }, [selectedAPI, selectedLLM, apiOptions, getLLMOptionsForAPI]);
 
   const handleInputChange = useCallback(() => {
     const textarea = textareaRef.current;
-    if (!textarea) return;
+    if (textarea) {
+      setMessage(textarea.value);
+      messageRef.current = textarea.value;
+      textarea.style.height = "auto";
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+    }
+  }, [textareaRef, messageRef]);
 
-    messageRef.current = textarea.value;
-
-    textarea.style.height = "auto";
-    textarea.style.height = Math.min(textarea.scrollHeight, 120) + "px";
-  }, []);
+  const handleSubmit = useCallback(() => {
+    if (!message.trim() && !selectedFile) return;
+    handleSendMessage();
+    setMessage("");
+    if (textareaRef.current) {
+      textareaRef.current.value = "";
+      messageRef.current = "";
+      textareaRef.current.focus();
+      textareaRef.current.style.height = "auto";
+    }
+  }, [message, selectedFile, handleSendMessage, textareaRef, messageRef]);
 
   const handleKeyPress = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === "Enter" && !e.shiftKey) {
+      if (
+        e.key === "Enter" &&
+        !e.shiftKey &&
+        (message.trim() || selectedFile)
+      ) {
         e.preventDefault();
-        handleSendMessage();
+        handleSubmit();
       }
     },
-    [handleSendMessage]
+    [message, selectedFile, handleSubmit]
   );
 
   const handleFileSelect = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
-      if (file) {
-        setSelectedFile(file);
-      }
+      if (file) setSelectedFile(file);
     },
     [setSelectedFile]
   );
@@ -155,11 +237,10 @@ const MessageInput: React.FC<MessageInputProps> = ({
     setSelectedFile(null);
   }, [setSelectedFile]);
 
-  const handleAttachClick = useCallback(() => {
-    fileInputRef.current?.click();
-  }, [fileInputRef]);
-
-  const canSend = (messageRef.current?.trim() || selectedFile) && !loading;
+  const canSend = (message.trim() || selectedFile) && !loading;
+  const allCombinations = getAllCombinations();
+  const currentId = `${selectedAPI}:${selectedLLM}`;
+  const { provider, model } = getCurrentDisplayText();
 
   return (
     <>
@@ -174,7 +255,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
             transform: translateY(0) scale(1);
           }
         }
-
         @keyframes slideOutDown {
           from {
             opacity: 1;
@@ -187,7 +267,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
         }
       `}</style>
       <div className="w-full max-w-6xl mx-auto p-4 pb-0 pt-0">
-        {/* Selected File Display */}
         {selectedFile && (
           <div
             className={`mb-3 p-2 rounded-lg flex items-center justify-between ${
@@ -213,8 +292,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
             </button>
           </div>
         )}
-
-        {/* Main Input Container */}
         <div
           className={`border rounded-xl rounded-bl-none rounded-br-none ${
             theme === "dark"
@@ -222,13 +299,13 @@ const MessageInput: React.FC<MessageInputProps> = ({
               : "border-neutral-400 bg-white"
           } focus-within:border-blue-500 transition-colors`}
         >
-          {/* Text Input Area */}
           <div className="relative">
             <textarea
               ref={textareaRef}
               onInput={handleInputChange}
               onKeyDown={handleKeyPress}
-              defaultValue=""
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
               placeholder="Type your message here..."
               disabled={loading}
               className={`w-full p-3 pr-12 bg-transparent resize-none focus:outline-none min-h-[48px] max-h-[120px] overflow-y-auto scrollbar-thin scrollbar-thumb-transparent hover:scrollbar-thumb-gray-400 scrollbar-track-transparent ${
@@ -242,11 +319,9 @@ const MessageInput: React.FC<MessageInputProps> = ({
                 scrollbarColor: "transparent transparent",
               }}
             />
-
-            {/* Action Buttons */}
             <div className="absolute right-2 bottom-2 flex items-center gap-1">
               <button
-                onClick={handleSendMessage}
+                onClick={handleSubmit}
                 disabled={!canSend}
                 className={`p-2 rounded-lg transition-colors ${
                   canSend
@@ -262,172 +337,102 @@ const MessageInput: React.FC<MessageInputProps> = ({
               </button>
             </div>
           </div>
-
-          {/* Combined Model Selector */}
           <div className="px-3 py-1 flex flex-wrap gap-3 items-center">
-            <div className="relative w-auto" ref={dropdownRef}>
-              {/* Custom Dropdown */}
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => !loading && setIsDropdownOpen(!isDropdownOpen)}
-                  disabled={loading}
-                  className={`w-full flex items-center justify-between pl-3 pr-3 py-2 text-left rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm ${
-                    theme === "dark"
-                      ? "bg-neutral-800 border-neutral-600 text-white hover:bg-neutral-700"
-                      : "bg-white border-neutral-300 text-gray-900 hover:bg-gray-50"
-                  } 
-                ${
+            <div className="relative w-auto min-w-[240px]" ref={dropdownRef}>
+              <button
+                type="button"
+                onClick={() => !loading && setIsDropdownOpen(!isDropdownOpen)}
+                disabled={loading}
+                className={`w-full flex items-center justify-between pl-4 pr-3 py-1.5 text-left rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm ${
+                  theme === "dark"
+                    ? "bg-neutral-800 border-neutral-600 text-white hover:bg-neutral-700"
+                    : "bg-white border-neutral-300 text-neutral-900 hover:bg-neutral-50"
+                } ${
                   loading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
                 }`}
-                >
-                  <div className="min-w-0 flex-1">
-                    <div
-                      className={`text-sm truncate ${
-                        theme === "dark" ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      <span className="font-medium">
-                        {getDisplayText().providerLabel}
-                      </span>
-                      <span className="font-light">
-                        {" "}
-                        - {getDisplayText().modelLabel}
-                      </span>
-                    </div>
-                  </div>
-
-                  <IoChevronDown
-                    className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 ml-2 ${
-                      isDropdownOpen ? "rotate-180" : ""
+              >
+                <span className="truncate">
+                  <span
+                    className={`text-sm ${
+                      theme === "dark" ? "text-neutral-400" : "text-neutral-500"
                     }`}
-                  />
-                </button>
-
-                {/* Dropdown Options - Two Panel Design */}
-                {isDropdownOpen && (
-                  <div
-                    className={`absolute bottom-full left-0 z-50 mb-1 rounded-md border shadow-lg flex transition-all duration-200 ease-out transform ${
-                      isDropdownOpen
-                        ? "opacity-100 scale-100"
-                        : "opacity-0 scale-95"
-                    } ${
-                      theme === "dark"
-                        ? "bg-neutral-800 border-neutral-600"
-                        : "bg-white border-neutral-300"
-                    }`}
-                    style={{
-                      animation: isDropdownOpen
-                        ? "slideInUp 0.2s ease-out"
-                        : "slideOutDown 0.2s ease-in",
-                    }}
                   >
-                    {/* Providers Panel */}
+                    {provider} -{" "}
+                  </span>
+                  <span
+                    className={`text-sm font-medium ${
+                      theme === "dark" ? "text-white" : "text-neutral-900"
+                    }`}
+                  >
+                    {model}
+                  </span>
+                </span>
+                <IoChevronDown
+                  className={`w-4 h-4 text-neutral-400 transition-transform flex-shrink-0 ml-2 ${
+                    isDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+              {isDropdownOpen && (
+                <div
+                  className={`absolute bottom-full left-0 right-0 z-50 mb-1 rounded-md border shadow-lg max-h-80 overflow-y-auto transition-all duration-200 ease-out transform ${
+                    isDropdownOpen
+                      ? "opacity-100 scale-100"
+                      : "opacity-0 scale-95"
+                  } ${
+                    theme === "dark"
+                      ? "bg-neutral-800 border-neutral-600"
+                      : "bg-white border-neutral-300"
+                  }`}
+                  style={{
+                    animation: isDropdownOpen
+                      ? "slideInUp 0.2s ease-out"
+                      : "slideOutDown 0.2s ease-in",
+                  }}
+                >
+                  {allCombinations.map((combination) => (
                     <div
-                      className={`w-48 border-r ${
-                        theme === "dark"
-                          ? "border-neutral-600"
-                          : "border-neutral-200"
+                      key={combination.id}
+                      ref={
+                        currentId === combination.id ? selectedItemRef : null
+                      }
+                      onClick={() => handleCombinationSelection(combination.id)}
+                      className={`px-4 py-3 cursor-pointer transition-colors ${
+                        currentId === combination.id
+                          ? theme === "dark"
+                            ? "bg-neutral-700 text-white"
+                            : "bg-blue-50 text-blue-900"
+                          : theme === "dark"
+                          ? "text-neutral-200 hover:bg-neutral-700"
+                          : "text-neutral-700 hover:bg-neutral-50"
                       }`}
+                      data-id={combination.id}
                     >
-                      <div
-                        className={`px-3 py-2 text-xs font-medium border-b ${
-                          theme === "dark"
-                            ? "text-neutral-400 border-neutral-600"
-                            : "text-gray-500 border-gray-200"
-                        }`}
-                      >
-                        Providers
-                      </div>
-                      <div className="max-h-60 overflow-y-auto">
-                        {apiOptions.map((provider) => (
-                          <div
-                            key={provider.value}
-                            onMouseEnter={() =>
-                              setHoveredProvider(provider.value)
-                            }
-                            className={`px-3 py-3 cursor-pointer transition-colors flex items-center justify-between ${
-                              selectedAPI === provider.value
-                                ? theme === "dark"
-                                  ? "bg-neutral-700 text-white"
-                                  : "bg-blue-50 text-blue-900"
-                                : hoveredProvider === provider.value
-                                ? theme === "dark"
-                                  ? "bg-neutral-700 text-white"
-                                  : "bg-gray-50 text-gray-900"
-                                : theme === "dark"
-                                ? "text-neutral-200 hover:bg-neutral-700"
-                                : "text-gray-700 hover:bg-gray-50"
-                            }`}
-                          >
-                            <span className="text-sm font-medium">
-                              {provider.label}
-                            </span>
-                            <svg
-                              className="w-4 h-4 text-gray-400"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M9 5l7 7-7 7"
-                              />
-                            </svg>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Models Panel */}
-                    {hoveredProvider && (
-                      <div className="w-48">
-                        <div
-                          className={`px-3 py-2 text-xs font-medium border-b ${
+                      <div className="flex flex-col">
+                        <span
+                          className={`text-xs ${
                             theme === "dark"
-                              ? "text-neutral-400 border-neutral-600"
-                              : "text-gray-500 border-gray-200"
+                              ? "text-neutral-400"
+                              : "text-neutral-500"
                           }`}
                         >
-                          Models
-                        </div>
-                        <div className="max-h-60 overflow-y-auto">
-                          {getLLMOptionsForAPI(hoveredProvider).map((model) => (
-                            <div
-                              key={model.value}
-                              onClick={() =>
-                                handleProviderLLMSelection(
-                                  hoveredProvider,
-                                  model.value
-                                )
-                              }
-                              className={`px-3 py-3 cursor-pointer transition-colors ${
-                                selectedAPI === hoveredProvider &&
-                                selectedLLM === model.value
-                                  ? theme === "dark"
-                                    ? "bg-neutral-700 text-white"
-                                    : "bg-blue-50 text-blue-900"
-                                  : theme === "dark"
-                                  ? "text-neutral-200 hover:bg-neutral-700"
-                                  : "text-gray-700 hover:bg-gray-50"
-                              }`}
-                            >
-                              <span className="text-sm">{model.label}</span>
-                            </div>
-                          ))}
-                        </div>
+                          {combination.providerLabel}
+                        </span>
+                        <span
+                          className={`text-sm font-medium ${
+                            theme === "dark" ? "text-white" : "text-neutral-900"
+                          }`}
+                        >
+                          {combination.modelLabel}
+                        </span>
                       </div>
-                    )}
-                  </div>
-                )}
-              </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
-
-        {/* Hidden File Input */}
         <input
           ref={fileInputRef}
           type="file"

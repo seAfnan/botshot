@@ -142,7 +142,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
               >
                 {msg.sender === "user" ? (
                   // <div className="prose dark:prose-invert max-w-none whitespace-pre-wrap leading-relaxed">
-                  <div className="text-sm lg:font-light lg:text-base">
+                  <div className="prose dark:prose-invert max-w-none whitespace-pre-wrap leading-relaxed text-sm lg:font-normal lg:text-base">
                     {msg.content}
                   </div>
                 ) : (
@@ -268,7 +268,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         selectedLLM={selectedLLM}
         setSelectedLLM={setSelectedLLM}
         apiOptions={apiOptions}
-        getLLMOptions={getLLMOptions}
+        // getLLMOptions={getLLMOptions}
         fileInputRef={fileInputRef}
         textareaRef={textareaRef}
         handleSendMessage={handleSendMessage}

@@ -76,10 +76,11 @@ const Dashboard = () => {
 
   useEffect(() => {
     const availableOptions = getLLMOptions();
-    if (availableOptions.length > 0) {
+    const validLLMValues = availableOptions.map((option) => option.value);
+    if (availableOptions.length > 0 && !validLLMValues.includes(selectedLLM)) {
       setSelectedLLM(availableOptions[0].value);
     }
-  }, [selectedAPI]);
+  }, [selectedAPI, selectedLLM]);
 
   // Show login modal on page load if user is not authenticated
   useEffect(() => {
@@ -490,6 +491,10 @@ const Dashboard = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const handleSetSelectedLLM = (llm: string) => {
+    setSelectedLLM(llm);
+  };
+
   // Add this early return
   if (!isInitialized) {
     return (
@@ -535,7 +540,6 @@ const Dashboard = () => {
             startEditingTitle={startEditingTitle}
             saveTitle={saveTitle}
             cancelEditing={cancelEditing}
-            // Pass loading states to Sidebar
             isCreatingChat={isCreatingChat}
             loadingChatId={loadingChatId}
             deletingChatId={deletingChatId}
@@ -555,13 +559,12 @@ const Dashboard = () => {
             selectedAPI={selectedAPI}
             setSelectedAPI={setSelectedAPI}
             selectedLLM={selectedLLM}
-            setSelectedLLM={setSelectedLLM}
+            setSelectedLLM={handleSetSelectedLLM}
             apiOptions={apiOptions}
             getLLMOptions={getLLMOptions}
             fileInputRef={fileInputRef}
             textareaRef={textareaRef}
             handleSendMessage={handleSendMessage}
-            // Pass loading state to ChatArea
             loadingChatId={loadingChatId}
           />
           {sidebarOpen && (
