@@ -170,18 +170,17 @@ const MessageInput: React.FC<MessageInputProps> = ({
         {/* Dropdowns Section */}
         <div className="px-3 py-1 flex flex-wrap gap-3 items-center">
           {/* API Selector */}
-          <div className="relative w-36">
+          <div className="relative w-40">
             <select
               value={selectedAPI}
               onChange={(e) => setSelectedAPI(e.target.value)}
               disabled={loading}
-              className={`appearance-none w-full pl-3 pr-8 py-2 text-sm rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm
-        ${
-          theme === "dark"
-            ? "bg-neutral-800 border-neutral-600 text-white"
-            : "bg-white border-neutral-300 text-gray-900"
-        } 
-        ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+              className={`appearance-none w-full pl-3 pr-8 py-2 text-sm rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm ${
+                theme === "dark"
+                  ? "bg-neutral-800 border-neutral-600 text-white"
+                  : "bg-white border-neutral-300 text-gray-900"
+              } 
+              ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               {apiOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -201,18 +200,17 @@ const MessageInput: React.FC<MessageInputProps> = ({
           </div>
 
           {/* LLM Selector */}
-          <div className="relative w-36">
+          <div className="relative w-40">
             <select
               value={selectedLLM}
               onChange={(e) => setSelectedLLM(e.target.value)}
               disabled={loading}
-              className={`appearance-none w-full pl-3 pr-8 py-2 text-sm rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm
-        ${
-          theme === "dark"
-            ? "bg-neutral-800 border-neutral-600 text-white"
-            : "bg-white border-neutral-300 text-gray-900"
-        } 
-        ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+              className={`appearance-none w-full pl-3 pr-8 py-2 text-sm rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm ${
+                theme === "dark"
+                  ? "bg-neutral-800 border-neutral-600 text-white"
+                  : "bg-white border-neutral-300 text-gray-900"
+              } 
+                ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               {getLLMOptions().map((option) => (
                 <option key={option.value} value={option.value}>
