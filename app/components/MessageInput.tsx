@@ -170,7 +170,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
         {/* Dropdowns Section */}
         <div className="px-3 py-1 flex flex-wrap gap-3 items-center">
           {/* API Selector */}
-          <div className="relative w-40">
+          <div className="relative sm:w-36 lg:w-40">
             <select
               value={selectedAPI}
               onChange={(e) => setSelectedAPI(e.target.value)}
@@ -200,7 +200,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
           </div>
 
           {/* LLM Selector */}
-          <div className="relative w-40">
+          <div className="relative sm:w-36 lg:w-40">
             <select
               value={selectedLLM}
               onChange={(e) => setSelectedLLM(e.target.value)}
