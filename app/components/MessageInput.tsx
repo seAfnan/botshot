@@ -168,48 +168,68 @@ const MessageInput: React.FC<MessageInputProps> = ({
         </div>
 
         {/* Dropdowns Section */}
-        <div className="px-3 py-2 flex justify-start gap-3">
-          <select
-            value={selectedAPI}
-            onChange={(e) => setSelectedAPI(e.target.value)}
-            disabled={loading}
-            className={`px-2 py-1 text-xs border rounded-sm focus:outline-none focus:ring-1 focus:ring-blue-500 w-32 ${
-              theme === "dark"
-                ? "border-neutral-600 bg-neutral-700 text-neutral-200"
-                : "border-neutral-300 bg-neutral-50 text-neutral-700"
-            } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
-          >
-            {apiOptions.map((option) => (
-              <option
-                className="rounded-sm"
-                key={option.value}
-                value={option.value}
+        <div className="px-3 py-1 flex flex-wrap gap-3 items-center">
+          {/* API Selector */}
+          <div className="relative w-36">
+            <select
+              value={selectedAPI}
+              onChange={(e) => setSelectedAPI(e.target.value)}
+              disabled={loading}
+              className={`appearance-none w-full pl-3 pr-8 py-2 text-sm rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm
+        ${
+          theme === "dark"
+            ? "bg-neutral-800 border-neutral-600 text-white"
+            : "bg-white border-neutral-300 text-gray-900"
+        } 
+        ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+            >
+              {apiOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+              <svg
+                className="h-4 w-4 text-gray-400"
+                fill="currentColor"
+                viewBox="0 0 20 20"
               >
-                {option.label}
-              </option>
-            ))}
-          </select>
+                <path d="M5.25 7.5L10 12.25L14.75 7.5H5.25Z" />
+              </svg>
+            </div>
+          </div>
 
-          <select
-            value={selectedLLM}
-            onChange={(e) => setSelectedLLM(e.target.value)}
-            disabled={loading}
-            className={`px-2 py-1 text-xs border rounded-sm focus:outline-none focus:ring-1 focus:ring-blue-500 w-32 ${
-              theme === "dark"
-                ? "border-neutral-600 bg-neutral-700 text-neutral-200"
-                : "border-neutral-300 bg-neutral-50 text-neutral-700"
-            } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
-          >
-            {getLLMOptions().map((option) => (
-              <option
-                className="rounded-sm"
-                key={option.value}
-                value={option.value}
+          {/* LLM Selector */}
+          <div className="relative w-36">
+            <select
+              value={selectedLLM}
+              onChange={(e) => setSelectedLLM(e.target.value)}
+              disabled={loading}
+              className={`appearance-none w-full pl-3 pr-8 py-2 text-sm rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm
+        ${
+          theme === "dark"
+            ? "bg-neutral-800 border-neutral-600 text-white"
+            : "bg-white border-neutral-300 text-gray-900"
+        } 
+        ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+            >
+              {getLLMOptions().map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+              <svg
+                className="h-4 w-4 text-gray-400"
+                fill="currentColor"
+                viewBox="0 0 20 20"
               >
-                {option.label}
-              </option>
-            ))}
-          </select>
+                <path d="M5.25 7.5L10 12.25L14.75 7.5H5.25Z" />
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
 
