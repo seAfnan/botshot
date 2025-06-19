@@ -29,7 +29,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
       <div
         className={`relative rounded-2xl shadow-2xl p-8 w-full max-w-md transform transition-all duration-300 backdrop-blur-xs ${
           theme === "dark"
-            ? "bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950 border border-neutral-200"
+            ? "bg-gradient-to-b from-neutral-900 via-neutral-900 to-neutral-950 border border-neutral-200"
             : "bg-white/95 border border-gray-200/50"
         }`}
       >
