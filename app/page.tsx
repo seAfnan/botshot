@@ -82,7 +82,7 @@ const Dashboard = () => {
     }
   }, [selectedAPI, selectedLLM]);
 
-  // Show login modal on page load if user is not authenticated
+  // Initialize the app without showing login modal
   useEffect(() => {
     let timeoutId;
 
@@ -93,11 +93,12 @@ const Dashboard = () => {
 
     timeoutId = setTimeout(() => {
       setIsInitialized(true);
-      if (status === "unauthenticated") {
-        setShowLoginModal(true);
-      } else if (status === "authenticated") {
-        setShowLoginModal(false);
-      }
+      // Remove the automatic login modal display
+      // if (status === "unauthenticated") {
+      //   setShowLoginModal(true);
+      // } else if (status === "authenticated") {
+      //   setShowLoginModal(false);
+      // }
     }, 200);
 
     return () => clearTimeout(timeoutId);
@@ -174,6 +175,7 @@ const Dashboard = () => {
   }, [status, isInitialized]);
 
   const handleSendMessage = async () => {
+    // Check authentication only when user tries to send a message
     if (status !== "authenticated") {
       setShowLoginModal(true);
       return;

@@ -1,6 +1,6 @@
 "use client";
 import { signIn } from "next-auth/react";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 interface LoginModalProps {
   theme?: string;
@@ -12,6 +12,24 @@ const LoginModal: React.FC<LoginModalProps> = ({
   setShowLoginModal,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  // Handle outside click
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
+      ) {
+        setShowLoginModal(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [setShowLoginModal]);
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
@@ -27,6 +45,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black/10 backdrop-blur-md flex items-center justify-center z-50 p-4">
       <div
+        ref={modalRef}
         className={`relative rounded-2xl shadow-2xl p-8 w-full max-w-md transform transition-all duration-300 backdrop-blur-xs ${
           theme === "dark"
             ? "bg-gradient-to-b from-neutral-900 via-neutral-900 to-neutral-950 border border-neutral-200"
